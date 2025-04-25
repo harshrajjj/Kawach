@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaPrint } from 'react-icons/fa';
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import customToast from '../utils/toast';
 
 const Print = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const Print = () => {
   useEffect(() => {
     // Check if fileId exists
     if (!fileId) {
-      toast.error('No document selected');
+      customToast.error('No document selected');
       navigate('/dashboard');
       return;
     }
@@ -52,12 +52,12 @@ const Print = () => {
           console.log('File data received');
           setFileData(response.data.file);
         } else {
-          toast.error('Failed to load document');
+          customToast.error('Failed to load document');
           navigate('/dashboard');
         }
       } catch (error) {
         console.error('Error fetching file:', error);
-        toast.error('Error loading document');
+        customToast.error('Error loading document');
         navigate('/dashboard');
       } finally {
         setLoading(false);
@@ -67,7 +67,7 @@ const Print = () => {
     // Add event listeners
     document.addEventListener('contextmenu', handleContextMenu);
     document.addEventListener('keydown', handleKeyDown);
-    
+
     // Disable drag and select
     document.addEventListener('selectstart', e => e.preventDefault());
     document.addEventListener('dragstart', e => e.preventDefault());
@@ -85,14 +85,14 @@ const Print = () => {
 
   const handlePrint = async () => {
     if (!fileData?.url) {
-      toast.error('No document available to print');
+      customToast.error('No document available to print');
       return;
     }
 
     try {
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
-        toast.error('Please allow popups to print');
+        customToast.error('Please allow popups to print');
         navigate('/dashboard');
         return;
       }
@@ -115,7 +115,7 @@ const Print = () => {
             document.addEventListener('keydown', e => {
               if (e.ctrlKey || e.key === 'F12') e.preventDefault();
             });
-            
+
             function handleAfterPrint() {
               window.close();
               window.opener.location.href = '/dashboard';
@@ -131,7 +131,7 @@ const Print = () => {
 
             // Listen for the afterprint event
             window.addEventListener('afterprint', handleAfterPrint);
-            
+
             // If window is closed without printing, redirect
             window.addEventListener('unload', () => {
               window.opener.location.href = '/dashboard';
@@ -146,7 +146,7 @@ const Print = () => {
       printWindow.document.close();
     } catch (error) {
       console.error('Print error:', error);
-      toast.error('Error printing document');
+      customToast.error('Error printing document');
       navigate('/dashboard');
     }
   };
@@ -161,7 +161,7 @@ const Print = () => {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-[#0a0118] to-[#0c0118] text-white p-6">
-      <div 
+      <div
         ref={containerRef}
         className="max-w-2xl mx-auto mt-20 p-8 bg-[#1a1127] rounded-xl shadow-xl"
       >

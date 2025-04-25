@@ -20,13 +20,19 @@ import jwt from 'jsonwebtoken'
 
 export const isAuthenticated = async (req, res, next) => {
     try {
-        // Get the token from the Authorization header
-        // Assuming it's in the format "Bearer <token>"
-        // Split the header value by space and get the second element (index 1)
-        const token = req.headers.authorization?.split(' ')[1];  // The token itself
+        // Check for token in cookies first (more secure)
+        let token = req.cookies.token;
+
+        // If no token in cookies, check Authorization header as fallback
+        // This allows both methods to work during transition
+        if (!token && req.headers.authorization) {
+            token = req.headers.authorization.split(' ')[1];  // Bearer <token>
+        }
+
         if (!token) {
             return res.status(401).send('Access denied. No token provided.');
         }
+
         const decode = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decode; // Attach user info to request (_id)
         next();

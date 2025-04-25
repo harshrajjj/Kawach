@@ -4,7 +4,7 @@ import { FaUser, FaUpload, FaHistory, FaSignOutAlt, FaLock, FaQrcode } from 'rea
 import { useAuth } from '../context/AuthContext';
 import Animate from '../components/Animate';
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import customToast from '../utils/toast';
 import { gsap } from 'gsap';
 
 const Dashboard = () => {
@@ -58,7 +58,7 @@ const Dashboard = () => {
     try {
       console.log('Upload started, file:', file);
       if (!file) return;
-      
+
       const formData = new FormData();
       formData.append('file', file);
       console.log('FormData created with file');
@@ -70,28 +70,28 @@ const Dashboard = () => {
         }
       });
       console.log('Upload response:', res.data);
-      
+
       if (res.data.success) {
         setFile(res.data.fileId);
-        toast.success('File uploaded successfully');
-        navigate('/generate-qr'); // Navigate after successful upload   ?????????
+        customToast.success('File uploaded successfully');
+        navigate('/generate-qr'); // Navigate after successful upload
       } else {
-        toast.error(res.data.message);
+        customToast.error(res.data.message);
       }
     } catch (error) {
       console.error('Upload error details:', error.response?.data || error.message);
-      toast.error('Error uploading file');
+      customToast.error('Error uploading file. Please try again.');
     }
   };
 
-  const handleLogout = () => {    
-    logout();          // token is removed from localstorage 
+  const handleLogout = () => {
+    logout();          // token is removed from localstorage
     navigate('/');
   };
 
   return (
     <div className="relative overflow-hidden min-h-screen bg-black text-white">
-      <Animate /> 
+      <Animate />
 
       {/* Navigation Bar */}
       <nav className="relative z-10 bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">

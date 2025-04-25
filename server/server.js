@@ -3,6 +3,7 @@ import colors from 'colors'
 import dotenv from 'dotenv'
 import morgan from 'morgan'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import connectDb from './config/db.js'
 import authRoutes from './routes/authRoutes.js'
 import fileRoutes from './routes/fileRoutes.js'
@@ -18,13 +19,17 @@ console.log('Environment Variables Loaded:', {
 const app = express();
 
 // CORS configuration
-app.use(cors({
-    origin: true,  // Allow all origins
-    credentials: false  
+app.use(cors((req, callback) => {
+  const corsOptions = {
+    origin: true, // Allow all origins
+    credentials: true // Allow credentials
+  };
+  callback(null, corsOptions);
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
@@ -32,7 +37,7 @@ app.set('view engine', 'ejs');
 dotenv.config()
 //() es config mei es brackets mei path dena hota   hai hamare case mei root par hai thats why we are not giving path
 
-//database config 
+//database config
 connectDb();
 
 //middlewares

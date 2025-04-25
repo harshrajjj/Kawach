@@ -21,7 +21,7 @@ export const registerController = async (req, res) => {
     }
     if (!phone) {
       return res.send({ message: "Phone no is Required" });
-    }   
+    }
      //check user
     const exisitingUser = await userModel.findOne({ email });
     //exisiting user
@@ -67,6 +67,7 @@ export const loginController = async (req, res) => {
         message: "Invalid email or password",
       });
     }
+    console.log('email',email);
     //check user
     const user = await userModel.findOne({ email });
     if (!user) {
@@ -90,6 +91,16 @@ export const loginController = async (req, res) => {
     const token = JWT.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
+
+    // Set token in HTTP-only cookie for better security
+    // This cookie will be sent with every request but can't be accessed by JavaScript
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      sameSite: 'strict',
+      maxAge: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
+    });
+
     res.status(200).send({
       success: true,
       message: "login successfully",
@@ -100,7 +111,7 @@ export const loginController = async (req, res) => {
         phone: user.phone,
         address: user.address,
       },
-      token,
+      token, // Still send token in response for client-side storage
     });
   } catch (error) {
     console.log(error);
@@ -113,9 +124,28 @@ export const loginController = async (req, res) => {
 };
 
 
-// test controller 
+// test controller
+export const testController = (req,res)=>{
+    console.log('protected router',req.user)
+    res.send("protected route");
+}
 
-  export const testController = (req,res)=>{
-      console.log('protected router',req.user)
-      res.send("protected route");
+// logout controller
+export const logoutController = (req, res) => {
+  try {
+    // Clear the token cookie
+    res.clearCookie('token');
+
+    res.status(200).send({
+      success: true,
+      message: "Logged out successfully"
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in logout",
+      error
+    });
   }
+}

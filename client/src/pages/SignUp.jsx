@@ -8,7 +8,7 @@ import { FaLock, FaEnvelope, FaUser, FaPhone } from 'react-icons/fa';
 import gsap from 'gsap';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import customToast from '../utils/toast';
 import Animate from '../components/Animate';
 
 const Signup = () => {
@@ -23,11 +23,11 @@ const Signup = () => {
 
   useEffect(() => {
     const tl = gsap.timeline();
-    tl.fromTo('.signup-card', 
+    tl.fromTo('.signup-card',
       { y: 100, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
     );
-    tl.fromTo('.form-element', 
+    tl.fromTo('.form-element',
       { y: 20, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: 'power2.out' }
     );
@@ -35,24 +35,24 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try { 
-      const { name, email, password, phone } = formData; 
+    try {
+      const { name, email, password, phone } = formData;
       const res = await axios.post(`/api/v1/auth/register`, { name, email, password, phone });
       if (res.data.success) {
-        toast.success(res.data.message);
+        customToast.success(res.data.message);
         navigate('/dashboard');
       } else {
-        toast.error(res.data.message);
+        customToast.error(res.data.message);
       }
     } catch (err) {
       console.log(err);
-      toast.error("Something went wrong");
+      customToast.error("Something went wrong. Please try again.");
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({ 
+    setFormData(prevState => ({
       ...prevState,
       [name]: value
     }));
@@ -71,7 +71,7 @@ const Signup = () => {
             Join thousands who trust Kawach with their security
           </p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="form-element relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

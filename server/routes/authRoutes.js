@@ -1,5 +1,10 @@
 import express from 'express';
-import {loginController, registerController, testController} from '../controllers/authController.js';
+import {
+  loginController,
+  registerController,
+  testController,
+  logoutController
+} from '../controllers/authController.js';
 import {isAuthenticated } from '../middlewares/authMiddleware.js';
 
  //router object
@@ -9,10 +14,12 @@ const router = express.Router();
 router.post("/register", registerController);
 
 //login|| post
-router.post('/login',loginController);
+router.post('/login', loginController);
+
+// logout route
+router.get('/logout', logoutController);
 
 // test routes
-
-router.get('/test',isAuthenticated,testController)
+router.get('/test', isAuthenticated, testController);
 
 export default router;

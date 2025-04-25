@@ -4,7 +4,7 @@ import { FaLock, FaArrowLeft, FaTrash, FaQrcode } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import Animate from '../components/Animate';
 import axios from 'axios';
-import { toast, Toaster } from 'react-hot-toast';
+import customToast from '../utils/toast';
 
 const GenerateQR = () => {
   const navigate = useNavigate();
@@ -48,12 +48,12 @@ const GenerateQR = () => {
         setQrCode(null);
         setQrGenerated(false);
         setDocumentInfo(null);
-        toast.success('QR Code has expired and file has been deleted');
+        customToast.success('QR Code has expired and file has been deleted');
         navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error deleting file:', error);
-      toast.error('Error deleting file');
+      customToast.error('Error deleting file');
     }
   };
 
@@ -72,7 +72,7 @@ const GenerateQR = () => {
         setQrCode(null);
       }
       //  // Simulate API delay
-      //  await new Promise(resolve => setTimeout(resolve, 7000));  
+      //  await new Promise(resolve => setTimeout(resolve, 7000));
 
       // Fetch qr code
       const res = await axios.get(`/api/v1/file/qrcode/${fileId}`, {
@@ -86,7 +86,7 @@ const GenerateQR = () => {
       }
 
       const { qrCode, fileName, uploadDate } = res.data;
-      
+
       // Set the new QR code
       setQrCode(qrCode);
       setDocumentInfo({
@@ -95,7 +95,7 @@ const GenerateQR = () => {
         status: 'Active'
       });
       setQrGenerated(true);
-      
+
       // Start the timer
       setTimeLeft(20);
       setTimerActive(true);
@@ -108,7 +108,7 @@ const GenerateQR = () => {
         navigate('/');
       } else {
         setError('Failed to generate QR code. Please try again.');
-        toast.error('Failed to generate QR code');
+        customToast.error('Failed to generate QR code');
       }
     } finally {
       setLoading(false);   // after qr code is generated set loading false
@@ -120,7 +120,7 @@ const GenerateQR = () => {
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#0a0118] to-[#0c0118] text-white">
       <Animate />
-      
+
       {/* Navigation Bar */}
       <nav className="relative z-10 bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -156,9 +156,9 @@ const GenerateQR = () => {
                       <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg blur opacity-40 group-hover:opacity-75 transition duration-1000"></div>
                       <div className="relative p-1 bg-black rounded-lg">
                         <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-lg p-4">
-                          <img 
-                            src={qrCode} 
-                            alt="QR Code" 
+                          <img
+                            src={qrCode}
+                            alt="QR Code"
                             className="w-64 h-64 rounded-lg shadow-2xl transform transition-transform duration-500 group-hover:scale-105"
                           />
                         </div>
@@ -174,7 +174,7 @@ const GenerateQR = () => {
                         <div className="space-y-2 text-gray-300">
                           <p><span className="text-gray-400">Name:</span> {documentInfo?.name}</p>
                           <p><span className="text-gray-400">Upload Date:</span> {documentInfo?.uploadDate}</p>
-                          <p><span className="text-gray-400">Status:</span> 
+                          <p><span className="text-gray-400">Status:</span>
                             <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400">
                               {documentInfo?.status}
                             </span>
@@ -189,7 +189,7 @@ const GenerateQR = () => {
                         </h3>
                         <div className="flex items-center space-x-4">
                           <div className="w-full bg-gray-800 rounded-full h-4 overflow-hidden">
-                            <div 
+                            <div
                               className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 transition-all duration-1000"
                               style={{ width: `${(timeLeft / 60) * 100}%` }}
                             ></div>
@@ -233,9 +233,8 @@ const GenerateQR = () => {
           )}
         </div>
       </div>
-      <Toaster />
     </div>
   );
 };
 
-export default GenerateQR;  
+export default GenerateQR;

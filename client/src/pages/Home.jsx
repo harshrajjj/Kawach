@@ -81,6 +81,17 @@ const Home = () => {
                 </button>
               </div>
             )}
+            {user && (
+              <div className="hero-text flex gap-4 justify-center">
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-4 rounded-lg hover:opacity-90 transition flex items-center gap-2"
+                >
+                  <FaLock className="text-xl" />
+                  Dashboard
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

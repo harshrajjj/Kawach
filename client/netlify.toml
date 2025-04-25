@@ -1,5 +1,10 @@
 [[headers]]
-  for = "/*"
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "text/javascript"
+
+[[headers]]
+  for = "/*.jsx"
   [headers.values]
     Content-Type = "text/javascript"
 
@@ -7,3 +12,7 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[build]
+  command = "npm run build"
+  publish = "dist"

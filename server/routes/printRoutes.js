@@ -4,7 +4,7 @@ import { isAuthenticated } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
-router.get('/:fileId', isAuthenticated, async (req, res) => {
+router.get('/:fileId',  async (req, res) => {
     try {
         const { fileId } = req.params;
         

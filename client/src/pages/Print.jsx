@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FaPrint } from 'react-icons/fa';
 import axios from 'axios';
 import customToast from '../utils/toast';
-import CustomPrintDialog from '../components/CustomPrintDialog';
 
 const Print = () => {
   const navigate = useNavigate();
@@ -11,7 +10,6 @@ const Print = () => {
   const containerRef = useRef(null);
   const [fileData, setFileData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showPrintDialog, setShowPrintDialog] = useState(false);
 
   useEffect(() => {
     // Check if fileId exists
@@ -85,28 +83,72 @@ const Print = () => {
     };
   }, [fileId, navigate]);
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     if (!fileData?.url) {
       customToast.error('No document available to print');
       return;
     }
 
-    // Show the custom print dialog instead of using the browser's print dialog
-    setShowPrintDialog(true);
-  };
+    try {
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        customToast.error('Please allow popups to print');
+        navigate('/dashboard');
+        return;
+      }
 
-  // Handle closing the print dialog
-  const handleClosePrintDialog = () => {
-    setShowPrintDialog(false);
-  };
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Print Document</title>
+          <style>
+            body { margin: 0; -webkit-print-color-adjust: exact; }
+            img { max-width: 100%; height: auto; }
+            @media print {
+              body { margin: 0; }
+            }
+          </style>
+          <script>
+            // Block right click and keyboard shortcuts
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', e => {
+              if (e.ctrlKey || e.key === 'F12') e.preventDefault();
+            });
 
-  // Handle print completion
-  const handlePrintComplete = () => {
-    customToast.success('Document printed successfully');
-    // Redirect to dashboard after printing
-    setTimeout(() => {
+            function handleAfterPrint() {
+              window.close();
+              window.opener.location.href = '/dashboard';
+            }
+
+            function handlePrint() {
+              window.print();
+              // Set a timeout to check if printing was cancelled
+              setTimeout(() => {
+                handleAfterPrint();
+              }, 1000);
+            }
+
+            // Listen for the afterprint event
+            window.addEventListener('afterprint', handleAfterPrint);
+
+            // If window is closed without printing, redirect
+            window.addEventListener('unload', () => {
+              window.opener.location.href = '/dashboard';
+            });
+          </script>
+        </head>
+        <body>
+          <img src="${fileData.url}" alt="Document" onload="handlePrint();" />
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    } catch (error) {
+      console.error('Print error:', error);
+      customToast.error('Error printing document');
       navigate('/dashboard');
-    }, 1500);
+    }
   };
 
   if (loading) {
@@ -152,15 +194,6 @@ const Print = () => {
           </p>
         </div>
       </div>
-
-      {/* Custom Print Dialog */}
-      {showPrintDialog && (
-        <CustomPrintDialog
-          fileData={{...fileData, fileId}}
-          onClose={handleClosePrintDialog}
-          onPrintComplete={handlePrintComplete}
-        />
-      )}
     </div>
   );
 };

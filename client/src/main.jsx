@@ -6,23 +6,8 @@ import { AuthProvider } from './context/AuthContext'
 import axios from 'axios'
 
 // Configure axios defaults
-const apiUrl = import.meta.env.VITE_BACKEND_API;
-axios.defaults.baseURL = apiUrl;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_API;
 axios.defaults.withCredentials = true;
-
-console.log('API URL:', apiUrl);
-
-// Add request interceptor for handling relative URLs in production
-axios.interceptors.request.use(
-  (config) => {
-    // If the URL is relative and we're in production, use the full API URL
-    if (config.url && config.url.startsWith('/api') && apiUrl) {
-      config.url = `${apiUrl}${config.url}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 createRoot(document.getElementById('root')).render(
       <AuthProvider>

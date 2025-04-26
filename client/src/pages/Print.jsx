@@ -19,6 +19,9 @@ const Print = () => {
       return;
     }
 
+    // Detect if user is on mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
     // Disable right-click
     const handleContextMenu = (e) => {
       e.preventDefault();
@@ -51,6 +54,13 @@ const Print = () => {
         if (response.data.success) {
           console.log('File data received');
           setFileData(response.data.file);
+
+          // Auto-trigger print only on desktop, not on mobile
+          if (!isMobile) {
+            setTimeout(() => {
+              handlePrint();
+            }, 1500);
+          }
         } else {
           customToast.error('Failed to load document');
           navigate('/dashboard');
@@ -81,6 +91,7 @@ const Print = () => {
       document.removeEventListener('selectstart', e => e.preventDefault());
       document.removeEventListener('dragstart', e => e.preventDefault());
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileId, navigate]);
 
   const handlePrint = async () => {
@@ -90,6 +101,9 @@ const Print = () => {
     }
 
     try {
+      // Detect if user is on mobile
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
         customToast.error('Please allow popups to print');
@@ -102,11 +116,66 @@ const Print = () => {
         <html>
         <head>
           <title>Print Document</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            body { margin: 0; -webkit-print-color-adjust: exact; }
-            img { max-width: 100%; height: auto; }
+            body {
+              margin: 0;
+              padding: 0;
+              -webkit-print-color-adjust: exact;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+              background-color: #f5f5f5;
+            }
+            .container {
+              max-width: 100%;
+              text-align: center;
+              padding: 20px;
+            }
+            img {
+              max-width: 100%;
+              height: auto;
+              display: block;
+              margin: 0 auto;
+            }
+            .mobile-message {
+              display: none;
+              margin: 20px 0;
+              padding: 15px;
+              background-color: #f8d7da;
+              color: #721c24;
+              border-radius: 5px;
+              text-align: center;
+              font-size: 16px;
+            }
+            .print-button {
+              display: inline-block;
+              margin-top: 20px;
+              padding: 10px 20px;
+              background-color: #4a90e2;
+              color: white;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              font-size: 16px;
+            }
             @media print {
-              body { margin: 0; }
+              body {
+                margin: 0;
+                padding: 0;
+              }
+              .container {
+                padding: 0;
+              }
+              .mobile-message, .print-button {
+                display: none !important;
+              }
+            }
+            @media screen and (max-width: 768px) {
+              .mobile-message {
+                display: block;
+              }
             }
           </style>
           <script>
@@ -118,15 +187,23 @@ const Print = () => {
 
             function handleAfterPrint() {
               window.close();
-              window.opener.location.href = '/dashboard';
+              if (window.opener) {
+                window.opener.location.href = '/dashboard';
+              }
             }
 
             function handlePrint() {
+              // On mobile, don't auto-trigger print
+              const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+              if (!isMobile) {
+                setTimeout(() => {
+                  window.print();
+                }, 1000);
+              }
+            }
+
+            function manualPrint() {
               window.print();
-              // Set a timeout to check if printing was cancelled
-              setTimeout(() => {
-                handleAfterPrint();
-              }, 1000);
             }
 
             // Listen for the afterprint event
@@ -134,12 +211,23 @@ const Print = () => {
 
             // If window is closed without printing, redirect
             window.addEventListener('unload', () => {
-              window.opener.location.href = '/dashboard';
+              if (window.opener) {
+                window.opener.location.href = '/dashboard';
+              }
             });
           </script>
         </head>
         <body>
-          <img src="${fileData.url}" alt="Document" onload="handlePrint();" />
+          <div class="container">
+            <div class="mobile-message">
+              <p><strong>Mobile Printing Instructions:</strong></p>
+              <p>1. Tap the "Print Document" button below</p>
+              <p>2. In the print dialog, select your printer</p>
+              <p>3. If using "Save as PDF", the document will be protected</p>
+            </div>
+            <img src="${fileData.url}" alt="Document" onload="handlePrint();" />
+            <button class="print-button" onclick="manualPrint()">Print Document</button>
+          </div>
         </body>
         </html>
       `);
@@ -158,6 +246,9 @@ const Print = () => {
       </div>
     );
   }
+
+  // Detect if user is on mobile
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-[#0a0118] to-[#0c0118] text-white p-6">
@@ -179,6 +270,18 @@ const Print = () => {
             </div>
           </div>
 
+          {isMobile && (
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-yellow-200">
+              <h3 className="font-semibold mb-2">Mobile Printing Instructions:</h3>
+              <ol className="list-decimal pl-5 space-y-1">
+                <li>Tap the "Print Document" button below</li>
+                <li>Select your printer in the dialog that appears</li>
+                <li>If using "Save as PDF", the document will be protected</li>
+                <li>If you encounter errors, try using a desktop browser</li>
+              </ol>
+            </div>
+          )}
+
           <button
             onClick={handlePrint}
             className="w-full py-4 px-6 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg
@@ -194,6 +297,17 @@ const Print = () => {
           </p>
         </div>
       </div>
+
+      {isMobile && (
+        <div className="max-w-2xl mx-auto mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg text-blue-200 text-sm">
+          <p className="font-semibold">Troubleshooting Tips:</p>
+          <ul className="list-disc pl-5 mt-2">
+            <li>Make sure your device is connected to a printer</li>
+            <li>If you see a "Save as PDF" option, you can use it to save the document</li>
+            <li>For best results, use Chrome or Safari on your mobile device</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

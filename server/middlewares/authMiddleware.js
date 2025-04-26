@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-// import userModel from '../models/userModel.js'
+import User from '../models/userModel.js'
 
 // not use (same in down)
 // Protected route token based
@@ -43,25 +43,31 @@ export const isAuthenticated = async (req, res, next) => {
 };
 
 
-//for now no use of it
+// Admin middleware to check if user has admin role
+export const isAdmin = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
 
-// export const isAdmin = async (req, res, next) => {
-//     try {
-//         const user = await userModel.findById(req.user._id);
-//         if (user.role !== 1) {
-//             return res.status(401).send({
-//                 success: false,
-//                 message: "Unauthorized access",
-//             });
-//         } else {
-//             next();
-//         }
-//     } catch (err) {
-//         console.log(err);
-//         res.status(401).send({
-//             success: false,
-//             err,
-//             message: "Error in admin middleware",
-//         });
-//     }
-// };
+        if (user.role !== 1) {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied. Admin privileges required."
+            });
+        }
+
+        next();
+    } catch (err) {
+        console.error("Error in admin middleware:", err);
+        res.status(500).json({
+            success: false,
+            message: "Error in admin authorization",
+            error: err.message
+        });
+    }
+};

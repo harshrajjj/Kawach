@@ -1,0 +1,237 @@
+/**
+ * Advanced Anti-screenshot CSS techniques
+ * These styles make it extremely difficult to take clean screenshots of the document
+ */
+
+/* Apply to the preview container */
+.anti-screenshot-container {
+  position: relative;
+  overflow: hidden;
+  /* Prevent selection */
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  /* Prevent context menu */
+  -webkit-touch-callout: none !important;
+}
+
+/* Create a strong noise pattern overlay */
+.anti-screenshot-noise {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpSIVBzuIOGSoThZERRy1CkWoEGqFVh1MbvqhNGlIUlwcBdeCgx+LVQcXZ10dXAVB8APE0clJ0UVK/F9SaBHjwXE/3t173L0DhGaVqWbPOKBqlpFOxMVcflUMvCKIEYQxICJTLzGdTMHzfHUPH1/vojzL+9yfo1ctWAzwicRzTDcs4g3imU1L57xPHGFlSSE+Jx436ILEj1yXXX7jXHDYzzMjRjo1TxwmFks9LPcwqxgq8TRxVFE1yvdnXVY4b3FWK1XO+58SFgvrLJc5TkcSS1iCBBEKaiijAhvRWnVQLKRpP+njH3L9ErkUcpXByLGAKjTIrh/8D353axamJ7ykSBzofLHtjxEguAs0m7b9fmy7zRPA/wxcaV1/rQXMfpLe6GiRI2CwDVxcOxrk7gM9Q4ZMXSkJyhTg/o+eWPrKErDzFuhd8+bWPsfpA5ClXiVvgINDYLRA2es+7+7t7O3fM63+fgDPnHLGjDu2UgAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAAd0SU1FB+UEBhQABPj0cJEAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAFElEQVRo3mP8z8DAwMDAwDCKRhEAMhgAEKbgA5bPQF0AAAAASUVORK5CYII=");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 20;
+  mix-blend-mode: overlay;
+}
+
+/* Create a more visible grid pattern */
+.anti-screenshot-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 10px 10px;
+  pointer-events: none;
+  z-index: 15;
+  mix-blend-mode: overlay;
+}
+
+/* Create a more visible text watermark pattern */
+.anti-screenshot-watermark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.anti-screenshot-watermark-text {
+  position: absolute;
+  transform: rotate(-45deg);
+  font-size: 2.5rem;
+  color: rgba(255, 255, 255, 0.15);
+  font-weight: bold;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  letter-spacing: 5px;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Multiple watermarks for better coverage */
+.anti-screenshot-watermark::before,
+.anti-screenshot-watermark::after {
+  content: "DO NOT SCREENSHOT";
+  position: absolute;
+  transform: rotate(-45deg);
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.1);
+  font-weight: bold;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+.anti-screenshot-watermark::before {
+  top: 25%;
+  left: -10%;
+}
+
+.anti-screenshot-watermark::after {
+  bottom: 25%;
+  right: -10%;
+}
+
+/* Prevent selection */
+.anti-screenshot-no-select {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  pointer-events: none !important;
+}
+
+/* Prevent drag */
+.anti-screenshot-no-drag {
+  -webkit-user-drag: none !important;
+  -khtml-user-drag: none !important;
+  -moz-user-drag: none !important;
+  -o-user-drag: none !important;
+  user-drag: none !important;
+  pointer-events: none !important;
+}
+
+/* Apply stronger filters to make screenshots less accurate */
+.anti-screenshot-filter {
+  filter: contrast(1.05) brightness(1.02) !important;
+  mix-blend-mode: normal;
+  opacity: 0.98;
+}
+
+/* More aggressive animation to make screenshots harder */
+@keyframes aggressive-movement {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(1px, 1px) scale(1.001);
+  }
+  50% {
+    transform: translate(0, 1px) scale(0.999);
+  }
+  75% {
+    transform: translate(-1px, 0) scale(1.001);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.anti-screenshot-animate {
+  animation: aggressive-movement 2s infinite;
+}
+
+/* Overlay that appears when screenshot is detected */
+.screenshot-blocked-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  text-align: center;
+  padding: 20px;
+}
+
+.screenshot-blocked-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #ff3333;
+}
+
+.screenshot-blocked-message {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.screenshot-blocked-instruction {
+  font-size: 14px;
+  margin-top: 20px;
+  color: #aaaaaa;
+}
+
+/* Content blur when not in focus - helps against screenshots */
+.anti-screenshot-blur-content {
+  filter: blur(0px);
+  transition: filter 0.1s ease-in-out;
+}
+
+.anti-screenshot-blur-content:not(:focus-within) {
+  filter: blur(1.5px);
+}
+
+/* Dynamic content that changes rapidly - makes screenshots useless */
+.anti-screenshot-dynamic-content {
+  position: relative;
+}
+
+.anti-screenshot-dynamic-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: dynamic-gradient 1s infinite;
+  pointer-events: none;
+  z-index: 25;
+}
+
+@keyframes dynamic-gradient {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Honeypot element to detect screenshot attempts */
+.anti-screenshot-honeypot {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  background-color: transparent;
+  z-index: -1;
+}

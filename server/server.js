@@ -8,6 +8,7 @@ import connectDb from './config/db.js'
 import authRoutes from './routes/authRoutes.js'
 import fileRoutes from './routes/fileRoutes.js'
 import printRoutes from './routes/printRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // Log environment variables (without sensitive data)
 console.log('Environment Variables Loaded:', {
@@ -47,6 +48,7 @@ app.use(morgan('dev'))
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/file", fileRoutes); // routes for file operations (upload, fetch, and QR generation)
 app.use('/api/v1/print', printRoutes);
+app.use('/api/v1/admin', adminRoutes); // admin routes for monitoring and management
 
 //rest api
 
